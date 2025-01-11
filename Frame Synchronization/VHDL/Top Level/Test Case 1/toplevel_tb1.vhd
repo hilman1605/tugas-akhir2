@@ -45,6 +45,7 @@ architecture tb of toplevel_tb1 is
     end component;
 
     signal clk, reset           : STD_LOGIC := '1';
+    signal sample_clk   : std_logic := '1';
     signal in_ready, out_valid  : STD_LOGIC;
     signal in_valid, out_ready  : STD_LOGIC := '0';
     signal dataA : SFIXED((1) downto -14);
@@ -76,6 +77,7 @@ begin
 
     -- Clock process definitions
     clk <= not clk after clk_period / 2;
+    sample_clk <= not sample_clk after sample_clk_period/2;
 
     process
     begin 
@@ -96,10 +98,11 @@ begin
             in_valid <= '1';
             wait for clk_period; -- Wait for one clock cycle
             in_valid <= '0';
-            out_ready <= '0'; -- Reset out_ready to '0'
             wait for clk_period; -- Wait for another clock cycle
             out_ready <= '1'; -- Set out_ready after two clock cycles from in_valid
             wait for clk_period; -- This ensures dataA and in_valid are updated every 2 cycles
+            out_ready <= '0'; -- Reset out_ready to '0'
+            wait for sample_clk_period;
         end loop;
     end process;
 end tb;
